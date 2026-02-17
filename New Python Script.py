@@ -1,9 +1,8 @@
 import streamlit as st
 
 st.set_page_config(page_title="Agri Drone Spreading Calculator", layout="centered")
-st.title("🚁 Spreader settings")
-
-st.caption("Includes valve setting & PWM reference mapping")
+st.title("🚁 Spreader dispense settings")
+st.caption("Automatic configuration based on material selection")
 
 st.divider()
 
@@ -13,20 +12,13 @@ st.divider()
 TURN_LOSS = 0.02
 ACRE_M2 = 4046.86
 
-# -----------------------
-# Reference Tables
-# -----------------------
-
-# Discharge rate reference (kg/min)
+# Reference tables
 DISCHARGE_TABLE = {
-    30: 10.0,
-    25: 8.0  # Placeholder (update later when tested)
+    30: 10.0  # 30% valve → 10 kg/min
 }
 
-# Swath width reference (PWM : width in meters)
 SWATH_TABLE = {
-    1500: 7.5,
-    1750: 10.5
+    1500: 7.5  # 1500 PWM → 7.5 m
 }
 
 # -----------------------
@@ -54,44 +46,29 @@ turns = st.number_input(
     step=1
 )
 
+st.divider()
+
 # -----------------------
-# Conditional Settings
+# Automatic Configuration
 # -----------------------
 
-if material == "DAP":
-    valve_setting = 30
-    pwm_setting = 1500
-else:
-    valve_setting = st.selectbox(
-        "Spreader Valve Open Setting (%)",
-        [30, 25]
-    )
+# Default settings (currently same for all materials)
+# DAP explicitly fixed per your requirement
+valve_setting = 30
+pwm_setting = 1500
 
-    pwm_setting = st.selectbox(
-        "PWM Setting",
-        [1500, 1750]
-    )
-
-# Fetch mapped values
 discharge_rate = DISCHARGE_TABLE[valve_setting]
 swath_width = SWATH_TABLE[pwm_setting]
-
-st.divider()
 
 # -----------------------
 # Calculations
 # -----------------------
 
-# Real area fixed at 1 acre
 A_real = 1.0
-
-# Ideal area considering turn loss
 A_ideal = A_real / ((1 - TURN_LOSS) ** turns)
 
-# Spray time (seconds)
 t_spray = (dispense / discharge_rate) * 60
 
-# Required speed (m/s)
 v_required = (A_ideal * ACRE_M2) / (swath_width * t_spray)
 
 # -----------------------
@@ -100,14 +77,12 @@ v_required = (A_ideal * ACRE_M2) / (swath_width * t_spray)
 st.subheader("📊 Results")
 
 st.metric("Required Speed (m/s)", f"{v_required:.3f}")
-
 st.metric("Valve Open Setting (%)", f"{valve_setting}%")
-
 st.metric("PWM Setting", f"{pwm_setting}")
 
 st.caption(
     "Model:\n"
     "1 acre = A_ideal × (1 - 0.02)^N\n"
     "Speed = (A_ideal × 4046.86) / (Swath × SprayTime)\n\n"
-    "Discharge & Swath derived from reference settings."
+    "Valve & PWM auto-configured for selected material."
 )
