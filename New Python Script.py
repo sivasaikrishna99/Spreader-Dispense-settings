@@ -76,7 +76,7 @@ v_required = (A_ideal * ACRE_M2) / (swath_width * t_spray)
 # -----------------------
 st.subheader("📊 Results")
 
-st.metric("Required Speed (m/s)", f"{v_required:.3f}")
+st.metric("Required Speed (m/s)", f"{v_required:.1f}")
 st.metric("Valve Open Setting (%)", f"{valve_setting}%")
 st.metric("PWM Setting", f"{pwm_setting}")
 
@@ -86,4 +86,5 @@ st.caption(
     "Speed = (A_ideal × 4046.86) / (Swath × SprayTime)\n\n"
     "Valve & PWM auto-configured for selected material."
 )
+
 
