@@ -27,7 +27,7 @@ SWATH_TABLE = {
 
 material = st.selectbox(
     "Spreading Material",
-    ["Urea", "DAP", "Potash"]
+    ["Urea", "DAP", "Potash", "Paddy", "Mustard", "Sesame"]
 )
 
 dispense = st.number_input(
@@ -86,5 +86,6 @@ st.caption(
     "Speed = (A_ideal × 4046.86) / (Swath × SprayTime)\n\n"
     "Valve & PWM auto-configured for selected material."
 )
+
 
 
