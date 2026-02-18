@@ -1,8 +1,8 @@
 import streamlit as st
 
 st.set_page_config(page_title="Agri Drone Spreading Calculator", layout="centered")
-st.title("🚁 Spreader dispense settings")
-st.caption("Automatic configuration based on material selection")
+st.title("🚁 Drone Speed Calculator")
+st.caption("Turn-loss based spreading model")
 
 st.divider()
 
@@ -12,14 +12,11 @@ st.divider()
 TURN_LOSS = 0.02
 ACRE_M2 = 4046.86
 
-# Reference tables
-DISCHARGE_TABLE = {
-    30: 10.0  # 30% valve → 10 kg/min
-}
-
-SWATH_TABLE = {
-    1500: 7.5  # 1500 PWM → 7.5 m
-}
+# Fixed configuration (current calibration)
+VALVE_SETTING = 30        # %
+PWM_SETTING = 1500        # PWM
+DISCHARGE_RATE = 10.0     # kg/min
+SWATH_WIDTH = 7.5         # meters
 
 # -----------------------
 # Inputs
@@ -27,11 +24,19 @@ SWATH_TABLE = {
 
 material = st.selectbox(
     "Spreading Material",
-    ["Urea", "DAP", "Potash", "Paddy", "Mustard", "Sesame"]
+    ["Urea", "DAP", "Potash"]
 )
 
-dispense = st.number_input(
-    "Total dispense weight per acre (kg/acre)",
+area = st.number_input(
+    "Area (acre)",
+    min_value=0.1,
+    max_value=50.0,
+    value=1.0,
+    step=0.1
+)
+
+dispense_per_acre = st.number_input(
+    "Total dispense weight per acre (kg)",
     min_value=1.0,
     max_value=200.0,
     value=25.0,
@@ -41,51 +46,54 @@ dispense = st.number_input(
 turns = st.number_input(
     "Number of turns (N)",
     min_value=0,
-    max_value=200,
-    value=12,
+    max_value=300,
+    value=11,
     step=1
 )
 
 st.divider()
 
 # -----------------------
-# Automatic Configuration
-# -----------------------
-
-# Default settings (currently same for all materials)
-# DAP explicitly fixed per your requirement
-valve_setting = 30
-pwm_setting = 1500
-
-discharge_rate = DISCHARGE_TABLE[valve_setting]
-swath_width = SWATH_TABLE[pwm_setting]
-
-# -----------------------
 # Calculations
 # -----------------------
 
-A_real = 1.0
+# Total material required (NEW constant display value)
+total_dispense = dispense_per_acre * area
+
+# Real area
+A_real = area
+
+# Ideal area required considering turn loss
 A_ideal = A_real / ((1 - TURN_LOSS) ** turns)
 
-t_spray = (dispense / discharge_rate) * 60
+# Spray time (seconds)
+t_spray = (total_dispense / DISCHARGE_RATE) * 60
 
-v_required = (A_ideal * ACRE_M2) / (swath_width * t_spray)
+# Required speed (m/s)
+v_required = (A_ideal * ACRE_M2) / (SWATH_WIDTH * t_spray)
+
+# Round to 1 decimal
+v_required = round(v_required, 1)
 
 # -----------------------
 # Output
 # -----------------------
 st.subheader("📊 Results")
 
-st.metric("Required Speed (m/s)", f"{v_required:.1f}")
-st.metric("Valve Open Setting (%)", f"{valve_setting}%")
-st.metric("PWM Setting", f"{pwm_setting}")
+c1, c2 = st.columns(2)
+
+with c1:
+    st.metric("Required Speed (m/s)", f"{v_required}")
+    st.metric("Total Weight (kg)", f"{round(total_dispense,1)}")
+
+with c2:
+    st.metric("Valve Open Setting (%)", f"{VALVE_SETTING}%")
+    st.metric("PWM Setting", f"{PWM_SETTING}")
 
 st.caption(
     "Model:\n"
-    "1 acre = A_ideal × (1 - 0.02)^N\n"
+    "Total Weight = kg/acre × Area\n"
+    "A_ideal = Area / (1 - 0.02)^N\n"
     "Speed = (A_ideal × 4046.86) / (Swath × SprayTime)\n\n"
-    "Valve & PWM auto-configured for selected material."
+    "Turn loss fixed at 2% per turn."
 )
-
-
-
