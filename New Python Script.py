@@ -1,7 +1,7 @@
 import streamlit as st
 
 st.set_page_config(page_title="Agri Drone Spreading Calculator", layout="centered")
-st.title("🚁 Drone Speed Calculator")
+st.title("🚁 Spreader settings")
 st.caption("Turn-loss based spreading model")
 
 st.divider()
@@ -28,7 +28,7 @@ material = st.selectbox(
 )
 
 dispense_per_acre = st.number_input(
-    "Total dispense weight per acre (kg)",
+    "Dispense weight per acre (kg/acre)",
     min_value=1.0,
     max_value=200.0,
     value=25.0,
@@ -98,4 +98,5 @@ st.caption(
     "Speed = (A_ideal × 4046.86) / (Swath × SprayTime)\n\n"
     "Turn loss fixed at 2% per turn."
 )
+
 
