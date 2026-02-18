@@ -24,7 +24,7 @@ SWATH_WIDTH = 7.5         # meters
 
 material = st.selectbox(
     "Spreading Material",
-    ["Urea", "DAP", "Potash"]
+    ["Urea", "DAP", "Potash", "Paddy", "Sesame", "Mustard"]
 )
 
 dispense_per_acre = st.number_input(
@@ -98,5 +98,6 @@ st.caption(
     "Speed = (A_ideal × 4046.86) / (Swath × SprayTime)\n\n"
     "Turn loss fixed at 2% per turn."
 )
+
 
 
