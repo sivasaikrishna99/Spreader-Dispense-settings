@@ -27,20 +27,21 @@ material = st.selectbox(
     ["Urea", "DAP", "Potash"]
 )
 
-area = st.number_input(
-    "Area (acre)",
-    min_value=0.1,
-    max_value=50.0,
-    value=1.0,
-    step=0.1
-)
-
 dispense_per_acre = st.number_input(
     "Total dispense weight per acre (kg)",
     min_value=1.0,
     max_value=200.0,
     value=25.0,
     step=1.0
+
+)
+
+area = st.number_input(
+    "Area (acre)",
+    min_value=0.1,
+    max_value=50.0,
+    value=1.0,
+    step=0.1
 )
 
 turns = st.number_input(
@@ -97,3 +98,4 @@ st.caption(
     "Speed = (A_ideal × 4046.86) / (Swath × SprayTime)\n\n"
     "Turn loss fixed at 2% per turn."
 )
+
